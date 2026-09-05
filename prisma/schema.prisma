@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String?
+  role         String    @default("user")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  profile             Profile?
+  conversations       Conversation[]
+  journalEntries      HealthJournal[]
+  symptomAssessments  SymptomAssessment[]
+  labReports          LabReport[]
+  auditLogs           AuditLog[]
+}
+
+model Profile {
+  id                    String    @id @default(uuid())
+  userId                String    @unique
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  age                   Int?
+  sex                   String?
+  heightCm              Float?
+  weightKg              Float?
+  bloodType             String?
+  allergies             String?
+  chronicConditions     String?
+  currentMedications    String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  updatedAt             DateTime  @updatedAt
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String    @default("New Health Query")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+}
+
+model Message {
+  id                 String       @id @default(uuid())
+  conversationId     String
+  conversation       Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role               String       // 'user' | 'assistant'
+  content            String       @db.Text
+  language           String?      @default("en")
+  redFlagDetected    Boolean      @default(false)
+  sources            String?      @db.Text // JSON encoded array of trusted sources
+  suggestedFollowUps String?      @db.Text // JSON encoded array of string questions
+  createdAt          DateTime     @default(now())
+}
+
+model HealthJournal {
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date              DateTime @default(now())
+  symptoms          String?
+  painLevel         Int?     @default(0) // 0-10
+  mood              String?  // 'good' | 'neutral' | 'poor' | 'anxious' | 'tired'
+  sleepHours        Float?
+  waterIntakeLiters Float?
+  systolicBp        Int?
+  diastolicBp       Int?
+  bloodGlucoseMgDl  Float?
+  weightKg          Float?
+  notes             String?  @db.Text
+  createdAt         DateTime @default(now())
+}
+
+model SymptomAssessment {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  primarySymptoms    String   // JSON array of strings
+  duration           String?
+  severity           String?  // 'mild' | 'moderate' | 'severe'
+  redFlagsDetected   String?  @db.Text // JSON array
+  possibleTopics     String?  @db.Text // JSON array of educational condition topics
+  recommendedAction  String?  @db.Text
+  questionsToDoctor  String?  @db.Text // JSON array
+  createdAt          DateTime @default(now())
+}
+
+model LabReport {
+  id             String      @id @default(uuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fileName       String
+  testDate       DateTime    @default(now())
+  labName        String?
+  overallSummary String?     @db.Text
+  results        LabResult[]
+  createdAt      DateTime    @default(now())
+}
+
+model LabResult {
+  id             String    @id @default(uuid())
+  reportId       String
+  report         LabReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  testName       String
+  numericValue   Float?
+  stringValue    String?
+  unit           String?
+  referenceRange String?   // Preserved from lab report
+  status         String?   // 'normal' | 'low' | 'high' | 'critical'
+  explanation    String?   @db.Text
+  questionsToAsk String?   @db.Text
+}
+
+model KnowledgeChunk {
+  id          String   @id @default(uuid())
+  title       String
+  sourceOrg   String   // 'WHO' | 'CDC' | 'NIH / MedlinePlus' | 'NHS'
+  sourceUrl   String
+  category    String   // e.g. 'chronic', 'infectious', 'cardiology', 'nutrition'
+  condition   String   // e.g. 'Diabetes', 'Hypertension', 'Asthma'
+  content     String   @db.Text
+  chunkIndex  Int      @default(0)
+  embedding   String?  @db.Text // JSON array of float vector
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String   // e.g. 'LOGIN', 'EXPORT_DATA', 'DELETE_ACCOUNT', 'DELETE_CHATS'
+  ipAddress String?
+  userAgent String?
+  metadata  String?  @db.Text
+  timestamp DateTime @default(now())
+}

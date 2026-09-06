@@ -6,6 +6,7 @@ import {
   HeartPulse,
   Mail,
   Github,
+  Linkedin,
   Copy,
   Check,
   Send,
@@ -34,6 +35,7 @@ export default function AboutPage() {
   const [submitted, setSubmitted] = useState(false);
 
   const developerEmail = 'shivangsaxena102006@gmail.com';
+  const linkedinUrl = 'https://www.linkedin.com/in/shivang-saxena1/';
   const githubUrl = 'https://github.com/shivangsaxena1011';
   const repoUrl = 'https://github.com/shivangsaxena1011/Health-Chatbot';
 
@@ -128,6 +130,16 @@ export default function AboutPage() {
               </a>
 
               <a
+                href={linkedinUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-[#0A66C2] hover:bg-[#004182] text-white text-xs font-bold rounded-xl transition-all active:scale-95 shadow-sm"
+              >
+                <Linkedin className="w-3.5 h-3.5" />
+                <span>LinkedIn Profile</span>
+              </a>
+
+              <a
                 href={githubUrl}
                 target="_blank"
                 rel="noreferrer"
@@ -162,6 +174,18 @@ export default function AboutPage() {
                 <div className="flex items-center justify-between text-slate-600">
                   <span className="font-medium text-slate-400">Email:</span>
                   <span className="font-bold text-slate-800 select-all">{developerEmail}</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-600">
+                  <span className="font-medium text-slate-400">LinkedIn:</span>
+                  <a
+                    href={linkedinUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-bold text-emerald-600 hover:underline flex items-center space-x-1"
+                  >
+                    <span>shivang-saxena1</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
                   <span className="font-medium text-slate-400">GitHub:</span>

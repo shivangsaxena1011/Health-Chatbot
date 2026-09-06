@@ -248,6 +248,7 @@ Swasth AI 2.0 is built natively for standard serverless or containerized deploym
 
 - **Developer & Architect**: Shivang Saxena
 - **Email**: [shivangsaxena102006@gmail.com](mailto:shivangsaxena102006@gmail.com)
+- **LinkedIn**: [https://www.linkedin.com/in/shivang-saxena1/](https://www.linkedin.com/in/shivang-saxena1/)
 - **GitHub Profile**: [@shivangsaxena1011](https://github.com/shivangsaxena1011)
 - **Project Repository**: [https://github.com/shivangsaxena1011/Health-Chatbot](https://github.com/shivangsaxena1011/Health-Chatbot)
 - **In-App About & Contact**: Visit the live `/about` page to view platform architecture highlights or submit direct feedback.

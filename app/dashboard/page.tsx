@@ -20,6 +20,7 @@ import {
   Award,
 } from 'lucide-react';
 import Disclaimer from '@/components/chat/Disclaimer';
+import InstallButton from '@/components/pwa/InstallButton';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
@@ -77,13 +78,16 @@ export default function DashboardPage() {
               Track your daily wellness metrics, evaluate symptom patterns, and access evidence-grounded health knowledge.
             </p>
           </div>
-          <Link
-            href="/"
-            className="self-start md:self-auto inline-flex items-center space-x-2 px-5 py-3 bg-white text-emerald-800 text-xs font-extrabold rounded-2xl shadow hover:bg-emerald-50 transition-transform active:scale-95 shrink-0"
-          >
-            <MessageSquare className="w-4 h-4 text-emerald-600" />
-            <span>Start AI Consultation</span>
-          </Link>
+          <div className="self-start md:self-auto flex items-center space-x-2 shrink-0">
+            <InstallButton variant="card" className="!bg-white/20 hover:!bg-white/30 !text-white !border !border-white/30" />
+            <Link
+              href="/"
+              className="inline-flex items-center space-x-2 px-5 py-2.5 bg-white text-emerald-800 text-xs font-extrabold rounded-2xl shadow hover:bg-emerald-50 transition-transform active:scale-95"
+            >
+              <MessageSquare className="w-4 h-4 text-emerald-600" />
+              <span>Start AI Consultation</span>
+            </Link>
+          </div>
         </div>
 
         <Disclaimer compact />

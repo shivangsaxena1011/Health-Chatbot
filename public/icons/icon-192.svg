@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#0d9488" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#047857" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="192" height="192" rx="44" fill="url(#grad1)" />
+  <!-- Medical Cross & Pulse Beat Wave -->
+  <g filter="url(#shadow)" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 96 40 L 96 152" />
+    <path d="M 40 96 L 152 96" />
+    <path d="M 32 108 L 68 108 L 84 74 L 108 126 L 124 96 L 160 96" stroke="#ecfdf5" stroke-width="10" />
+  </g>
+  <circle cx="146" cy="46" r="14" fill="#34d399" />
+  <path d="M 146 40 L 146 52 M 140 46 L 152 46" stroke="#064e3b" stroke-width="3.5" stroke-linecap="round" />
+</svg>

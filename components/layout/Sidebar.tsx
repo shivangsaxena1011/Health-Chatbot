@@ -17,6 +17,7 @@ import {
   Sparkles,
   Award,
 } from 'lucide-react';
+import InstallButton from '@/components/pwa/InstallButton';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -107,8 +108,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, user }) => {
           </div>
         )}
 
+        {/* PWA Install Button */}
+        <div className="mb-4">
+          <InstallButton variant="sidebar" />
+        </div>
+
         {/* Footer Card */}
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-2">
           <div className="p-4 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100 relative overflow-hidden">
             <div className="flex items-center space-x-2 text-emerald-700 mb-1">
               <Sparkles className="w-4 h-4 text-emerald-600" />

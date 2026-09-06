@@ -46,6 +46,7 @@ Swasth AI 2.0 transforms the prototype into a production-grade, full-stack healt
 | **Health Journal** | Daily tracking of blood pressure, blood glucose, sleep, pain scale, and lifestyle trends. |
 | **Health Dashboard** | Central command center showing vitals overviews, recent symptoms, and quick action cards. |
 | **Health Summary Report** | Printable/exportable patient health record designed for doctor appointment discussions. |
+| **PWA Web App Installation** | Installable Progressive Web App on Mobile (Android & iOS Safari) and Desktop (Chrome/Edge/Mac/PC) with offline shell. |
 | **Privacy & Security Center** | Granular data deletion (chats, journal, reports, profile, or account wipe) and GDPR JSON export. |
 
 ---

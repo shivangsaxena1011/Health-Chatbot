@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { HeartPulse, Globe, PhoneCall, Menu, X, LogIn, LogOut, User } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, Language } from '@/lib/types/health';
+import InstallButton from '@/components/pwa/InstallButton';
 
 interface NavbarProps {
   selectedLanguage: Language;
@@ -66,8 +67,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Right Controls: Language & Session */}
+      {/* Right Controls: Install, Language & Session */}
       <div className="flex items-center space-x-2">
+        {/* PWA Install Button */}
+        <InstallButton variant="navbar" />
+
         {/* Language Selector */}
         <div className="relative flex items-center">
           <Globe className="w-4 h-4 text-slate-400 absolute left-2.5 pointer-events-none" />

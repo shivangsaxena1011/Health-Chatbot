@@ -22,6 +22,7 @@ import {
   Award,
 } from 'lucide-react';
 import Disclaimer from '@/components/chat/Disclaimer';
+import InstallButton from '@/components/pwa/InstallButton';
 
 export default function AboutPage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -148,6 +149,8 @@ export default function AboutPage() {
                 <Github className="w-3.5 h-3.5" />
                 <span>GitHub Profile</span>
               </a>
+
+              <InstallButton variant="card" className="!py-2 !px-3.5 text-xs font-bold" />
             </div>
           </div>
 

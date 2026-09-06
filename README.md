@@ -197,19 +197,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 7. Testing & Verification
-
-Run the automated test suite:
-```bash
-npm test
-```
-Tests cover:
-- **Authentication**: Password hashing, salt validation, token signing, tampering rejection.
-- **Emergency Engine**: Cardiac, stroke (FAST), respiratory distress, anaphylaxis, self-harm, and non-emergency negative cases.
-- **RAG Engine**: Semantic synonym mapping, cosine similarity vector math, source attribution.
-- **Lab Parser**: Blood parameter extraction, reference interval comparisons, abnormal value alerts.
-- **Medicines & Interactions**: Drug catalog searches, major clinical drug interactions (Aspirin + Ibuprofen, Metformin + Alcohol).
-- **Security**: XSS script tag stripping, input length truncation, sliding-window rate limiting.
+## 7. Verification & Build
 
 Run TypeScript type check:
 ```bash

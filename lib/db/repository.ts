@@ -1,11 +1,16 @@
 import prisma from './prisma';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { hashPassword } from '../auth/password';
 
-// Local storage fallback path for environments where PostgreSQL server is not yet booted
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'local-db.json');
+// Dynamic storage fallback path (supports local development and serverless /tmp on Vercel)
+function getDataDir(): string {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join(os.tmpdir(), 'swasth-data');
+  }
+  return path.join(process.cwd(), 'data');
+}
 
 interface LocalDatabase {
   users: any[];
@@ -18,12 +23,17 @@ interface LocalDatabase {
   auditLogs: any[];
 }
 
+let inMemoryDb: LocalDatabase | null = null;
+
 function ensureDataDir(): LocalDatabase {
+  if (inMemoryDb) return inMemoryDb;
+  const dataDir = getDataDir();
+  const dataFile = path.join(dataDir, 'local-db.json');
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
     }
-    if (!fs.existsSync(DATA_FILE)) {
+    if (!fs.existsSync(dataFile)) {
       const initial: LocalDatabase = {
         users: [],
         profiles: [],
@@ -34,33 +44,46 @@ function ensureDataDir(): LocalDatabase {
         labReports: [],
         auditLogs: [],
       };
-      fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf-8');
+      try {
+        fs.writeFileSync(dataFile, JSON.stringify(initial, null, 2), 'utf-8');
+      } catch {
+        // Disk write may be restricted in some serverless modes
+      }
+      inMemoryDb = initial;
       return initial;
     }
-    const raw = fs.readFileSync(DATA_FILE, 'utf-8');
-    return JSON.parse(raw);
+    const raw = fs.readFileSync(dataFile, 'utf-8');
+    const parsed = JSON.parse(raw);
+    inMemoryDb = parsed;
+    return parsed;
   } catch (err) {
-    return {
-      users: [],
-      profiles: [],
-      conversations: [],
-      messages: [],
-      journals: [],
-      symptomAssessments: [],
-      labReports: [],
-      auditLogs: [],
-    };
+    if (!inMemoryDb) {
+      inMemoryDb = {
+        users: [],
+        profiles: [],
+        conversations: [],
+        messages: [],
+        journals: [],
+        symptomAssessments: [],
+        labReports: [],
+        auditLogs: [],
+      };
+    }
+    return inMemoryDb;
   }
 }
 
 function writeData(data: LocalDatabase) {
+  inMemoryDb = data;
+  const dataDir = getDataDir();
+  const dataFile = path.join(dataDir, 'local-db.json');
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
     }
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    fs.writeFileSync(dataFile, JSON.stringify(data, null, 2), 'utf-8');
   } catch (err) {
-    console.error('Error writing fallback local DB:', err);
+    // In serverless environments, inMemoryDb keeps state for the lifetime of the lambda
   }
 }
 

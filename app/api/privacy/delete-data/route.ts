@@ -9,6 +9,7 @@ import {
   deleteUser,
   logAuditEvent,
 } from '@/lib/db/repository';
+import { validateCsrf } from '@/lib/security/csrf';
 
 const deleteSchema = z.object({
   target: z.enum(['chats', 'journal', 'lab_reports', 'profile', 'account']),
@@ -16,6 +17,11 @@ const deleteSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const csrfCheck = await validateCsrf(req);
+    if (!csrfCheck.valid) {
+      return NextResponse.json({ error: 'CSRF validation failed.' }, { status: 403 });
+    }
+
     const session = await getSessionUser();
     if (!session) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });

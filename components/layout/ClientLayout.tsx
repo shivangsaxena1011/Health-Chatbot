@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
+import { MobileNav } from './MobileNav';
 import { SUPPORTED_LANGUAGES, Language } from '@/lib/types/health';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -35,7 +36,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-[100dvh] overflow-x-hidden overflow-y-hidden w-full max-w-full">
       <Navbar
         selectedLanguage={selectedLanguage}
         onSelectLanguage={setSelectedLanguage}
@@ -45,16 +46,22 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         onLogout={handleLogout}
       />
 
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden relative w-full">
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           user={user}
         />
-        <main className="flex-1 flex flex-col min-w-0 bg-slate-50 overflow-hidden relative">
+        <main className="flex-1 flex flex-col min-w-0 bg-slate-50 overflow-x-hidden overflow-y-auto relative pb-16 md:pb-0">
           {children}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar (< 768px) */}
+      <MobileNav
+        onOpenMenu={() => setIsSidebarOpen(true)}
+        isMenuOpen={isSidebarOpen}
+      />
     </div>
   );
 }

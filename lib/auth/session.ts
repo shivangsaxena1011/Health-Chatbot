@@ -2,7 +2,22 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
 const AUTH_COOKIE_NAME = 'swasth_session';
-const DEFAULT_SECRET = 'swasth_super_secure_jwt_secret_change_in_production_min_32_chars';
+function getAuthSecret(): string {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret || secret.trim().length < 32) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'CRITICAL SECURITY ERROR: AUTH_SECRET must be configured in environment variables and be at least 32 characters long in production.'
+      );
+    }
+    // Development-only fallback with warning
+    console.warn(
+      '⚠️ SECURITY WARNING: AUTH_SECRET is not configured or is under 32 characters. Please set AUTH_SECRET in .env.'
+    );
+    return secret || 'dev_secret_only_for_local_development_must_be_32_characters_minimum';
+  }
+  return secret;
+}
 
 export interface SessionUser {
   id: string;
@@ -12,7 +27,7 @@ export interface SessionUser {
 }
 
 export function signToken(user: SessionUser): string {
-  const secret = process.env.AUTH_SECRET || DEFAULT_SECRET;
+  const secret = getAuthSecret();
   return jwt.sign(
     {
       sub: user.id,
@@ -21,14 +36,14 @@ export function signToken(user: SessionUser): string {
       role: user.role,
     },
     secret,
-    { expiresIn: '7d' }
+    { expiresIn: '7d', algorithm: 'HS256' }
   );
 }
 
 export function verifyToken(token: string): SessionUser | null {
   try {
-    const secret = process.env.AUTH_SECRET || DEFAULT_SECRET;
-    const decoded = jwt.verify(token, secret) as any;
+    const secret = getAuthSecret();
+    const decoded = jwt.verify(token, secret, { algorithms: ['HS256'] }) as any;
     if (!decoded || !decoded.sub) return null;
     return {
       id: decoded.sub,

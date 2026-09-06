@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth/session';
 import { saveSymptomAssessment, getSymptomAssessments } from '@/lib/db/repository';
 import { assessSymptoms } from '@/lib/symptoms/symptom-checker';
 import { sanitizeInput } from '@/lib/security/sanitize';
+import { validateCsrf } from '@/lib/security/csrf';
 
 const symptomSchema = z.object({
   symptoms: z.array(z.string()).min(1, 'Please select at least one symptom'),
@@ -17,6 +18,11 @@ const symptomSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const csrfCheck = await validateCsrf(req);
+    if (!csrfCheck.valid) {
+      return NextResponse.json({ error: 'CSRF validation failed.' }, { status: 403 });
+    }
+
     const body = await req.json();
     const parsed = symptomSchema.safeParse(body);
     if (!parsed.success) {
@@ -68,7 +74,10 @@ export async function GET() {
       return NextResponse.json({ assessments: [] });
     }
     const assessments = await getSymptomAssessments(session.id);
-    return NextResponse.json({ success: true, assessments });
+    return NextResponse.json(
+      { success: true, assessments },
+      { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, private' } }
+    );
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch assessments' }, { status: 500 });
   }

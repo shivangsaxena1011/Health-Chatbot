@@ -50,14 +50,24 @@ export const Navbar: React.FC<NavbarProps> = ({
         </Link>
       </div>
 
-      {/* Center Emergency Badge */}
-      <div className="hidden lg:flex items-center space-x-2 bg-red-50 border border-red-200/80 px-3 py-1.5 rounded-full text-xs text-red-700">
-        <PhoneCall className="w-3.5 h-3.5 text-red-600 animate-bounce" />
-        <span className="font-bold">Medical Emergency? Call 112 / 911</span>
+      {/* Center Emergency Badge & Creator Link */}
+      <div className="hidden md:flex items-center space-x-3">
+        <Link
+          href="/about"
+          className="text-xs font-bold text-slate-600 hover:text-emerald-700 bg-slate-100/80 hover:bg-emerald-50 px-3 py-1.5 rounded-full border border-slate-200/80 transition-colors flex items-center space-x-1.5"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>About & Creator (Shivang)</span>
+        </Link>
+
+        <div className="hidden lg:flex items-center space-x-2 bg-red-50 border border-red-200/80 px-3 py-1.5 rounded-full text-xs text-red-700">
+          <PhoneCall className="w-3.5 h-3.5 text-red-600 animate-bounce" />
+          <span className="font-bold">Medical Emergency? Call 112 / 911</span>
+        </div>
       </div>
 
       {/* Right Controls: Language & Session */}
-      <div className="flex items-center space-x-2.5">
+      <div className="flex items-center space-x-2">
         {/* Language Selector */}
         <div className="relative flex items-center">
           <Globe className="w-4 h-4 text-slate-400 absolute left-2.5 pointer-events-none" />

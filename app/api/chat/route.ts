@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionUser } from '@/lib/auth/session';
 import { getProfile, getOrCreateConversation, addMessage } from '@/lib/db/repository';
-import { checkRateLimit } from '@/lib/security/rate-limit';
+import { checkChatRateLimit, getClientIp } from '@/lib/security/rate-limit';
 import { sanitizeInput } from '@/lib/security/sanitize';
+import { validateCsrf } from '@/lib/security/csrf';
 import { detectEmergency } from '@/lib/ai/emergency-engine';
 import { retrieveRelevantMedicalContext } from '@/lib/rag/retriever';
 import { aiProvider } from '@/lib/ai/gemini-provider';
@@ -20,10 +21,15 @@ const chatSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const session = await getSessionUser();
-    const identifier = session ? `user_${session.id}` : `ip_${req.headers.get('x-forwarded-for') || '127.0.0.1'}`;
+    const csrfCheck = await validateCsrf(req);
+    if (!csrfCheck.valid) {
+      return NextResponse.json({ error: 'CSRF validation failed.' }, { status: 403 });
+    }
 
-    const rateCheck = checkRateLimit(identifier, { limit: 30, windowMs: 60000 });
+    const session = await getSessionUser();
+    const identifier = session ? `user_${session.id}` : `ip_${getClientIp(req)}`;
+
+    const rateCheck = checkChatRateLimit(identifier);
     if (!rateCheck.allowed) {
       return NextResponse.json(
         { error: 'AI request limit reached. Please wait a moment before sending another query.' },

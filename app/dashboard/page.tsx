@@ -17,6 +17,7 @@ import {
   Droplets,
   Moon,
   Smile,
+  Award,
 } from 'lucide-react';
 import Disclaimer from '@/components/chat/Disclaimer';
 
@@ -88,7 +89,7 @@ export default function DashboardPage() {
         <Disclaimer compact />
 
         {/* Quick Action Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
           {[
             { title: 'AI Health Chat', desc: 'Ask symptoms & tips', href: '/', icon: MessageSquare, color: 'emerald' },
             { title: 'Symptom Checker', desc: 'Guided assessment', href: '/symptoms', icon: Stethoscope, color: 'blue' },
@@ -96,6 +97,7 @@ export default function DashboardPage() {
             { title: 'Lab Analyzer', desc: 'Understand blood tests', href: '/lab-reports', icon: FileText, color: 'purple' },
             { title: 'Medicines', desc: 'Uses & interactions', href: '/medicines', icon: Pill, color: 'amber' },
             { title: 'Health Summary', desc: 'Export summary', href: '/reports', icon: Download, color: 'rose' },
+            { title: 'About & Creator', desc: 'Shivang Saxena', href: '/about', icon: Award, color: 'emerald' },
           ].map((action, i) => {
             const Icon = action.icon;
             return (

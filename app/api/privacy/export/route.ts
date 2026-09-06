@@ -50,6 +50,7 @@ export async function GET(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Content-Disposition': `attachment; filename="swasth_health_data_export_${Date.now()}.json"`,
+        'Cache-Control': 'no-store, no-cache, must-revalidate, private',
       },
     });
   } catch (error) {

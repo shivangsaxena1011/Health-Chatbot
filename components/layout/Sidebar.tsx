@@ -15,6 +15,7 @@ import {
   Info,
   ShieldCheck,
   Sparkles,
+  Award,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -35,6 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, user }) => {
     { label: 'Medicine Information', href: '/medicines', icon: Pill },
     { label: 'Health Reports', href: '/reports', icon: Download },
     { label: 'Health Profile', href: '/profile', icon: User },
+    { label: 'About & Creator', href: '/about', icon: Award },
     { label: 'How It Works', href: '/how-it-works', icon: Info },
     { label: 'Privacy & Safety', href: '/privacy', icon: ShieldCheck },
   ];

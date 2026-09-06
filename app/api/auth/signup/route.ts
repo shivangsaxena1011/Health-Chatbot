@@ -3,8 +3,9 @@ import { z } from 'zod';
 import { hashPassword, validatePasswordStrength } from '@/lib/auth/password';
 import { setSessionCookie } from '@/lib/auth/session';
 import { findUserByEmail, createUser, logAuditEvent } from '@/lib/db/repository';
-import { checkRateLimit } from '@/lib/security/rate-limit';
+import { checkAuthRateLimit, getClientIp } from '@/lib/security/rate-limit';
 import { sanitizeInput } from '@/lib/security/sanitize';
+import { validateCsrf } from '@/lib/security/csrf';
 
 const signupSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -14,11 +15,16 @@ const signupSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
-    const rateCheck = checkRateLimit(`signup_${ip}`, { limit: 10, windowMs: 60000 });
+    const csrfCheck = await validateCsrf(req);
+    if (!csrfCheck.valid) {
+      return NextResponse.json({ error: 'CSRF validation failed.' }, { status: 403 });
+    }
+
+    const ip = getClientIp(req);
+    const rateCheck = checkAuthRateLimit(ip);
     if (!rateCheck.allowed) {
       return NextResponse.json(
-        { error: 'Too many signup attempts. Please wait a minute and try again.' },
+        { error: 'Too many registration attempts from this network. Please wait a few minutes and try again.' },
         { status: 429 }
       );
     }

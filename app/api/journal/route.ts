@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionUser } from '@/lib/auth/session';
 import { getJournalEntries, addJournalEntry } from '@/lib/db/repository';
 import { sanitizeInput } from '@/lib/security/sanitize';
+import { validateCsrf } from '@/lib/security/csrf';
 
 const journalSchema = z.object({
   date: z.string().optional(),
@@ -25,7 +26,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
     const entries = await getJournalEntries(session.id);
-    return NextResponse.json({ success: true, entries });
+    return NextResponse.json(
+      { success: true, entries },
+      { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, private' } }
+    );
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch journal entries' }, { status: 500 });
   }
@@ -33,6 +37,11 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const csrfCheck = await validateCsrf(req);
+    if (!csrfCheck.valid) {
+      return NextResponse.json({ error: 'CSRF validation failed.' }, { status: 403 });
+    }
+
     const session = await getSessionUser();
     if (!session) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });

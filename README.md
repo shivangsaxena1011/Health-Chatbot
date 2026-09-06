@@ -242,5 +242,18 @@ Swasth AI 2.0 is built natively for standard serverless or containerized deploym
 
 ---
 
-## 11. License
+## 11. Author, Lead Architect & Contact
+
+**Swasth AI 2.0** was architected and built by:
+
+- **Developer & Architect**: Shivang Saxena
+- **Email**: [shivangsaxena102006@gmail.com](mailto:shivangsaxena102006@gmail.com)
+- **GitHub Profile**: [@shivangsaxena1011](https://github.com/shivangsaxena1011)
+- **Project Repository**: [https://github.com/shivangsaxena1011/Health-Chatbot](https://github.com/shivangsaxena1011/Health-Chatbot)
+- **In-App About & Contact**: Visit the live `/about` page to view platform architecture highlights or submit direct feedback.
+
+---
+
+## 12. License
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+

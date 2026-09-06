@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionUser } from '@/lib/auth/session';
 import { getProfile, upsertProfile } from '@/lib/db/repository';
 import { sanitizeInput } from '@/lib/security/sanitize';
+import { validateCsrf } from '@/lib/security/csrf';
 
 const profileSchema = z.object({
   age: z.number().min(1).max(120).optional(),
@@ -24,7 +25,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
     const profile = await getProfile(session.id);
-    return NextResponse.json({ success: true, profile });
+    return NextResponse.json(
+      { success: true, profile },
+      { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, private' } }
+    );
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
   }
@@ -32,6 +36,11 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   try {
+    const csrfCheck = await validateCsrf(req);
+    if (!csrfCheck.valid) {
+      return NextResponse.json({ error: 'CSRF validation failed.' }, { status: 403 });
+    }
+
     const session = await getSessionUser();
     if (!session) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });

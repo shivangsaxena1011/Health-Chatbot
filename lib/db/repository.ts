@@ -181,10 +181,11 @@ export async function deleteUser(userId: string) {
   }
 
   const db = ensureDataDir();
+  const userConvIds = db.conversations.filter(c => c.userId === userId).map(c => c.id);
   db.users = db.users.filter(u => u.id !== userId);
   db.profiles = db.profiles.filter(p => p.userId !== userId);
   db.conversations = db.conversations.filter(c => c.userId !== userId);
-  db.messages = db.messages.filter(m => m.userId !== userId);
+  db.messages = db.messages.filter(m => !userConvIds.includes(m.conversationId));
   db.journals = db.journals.filter(j => j.userId !== userId);
   db.symptomAssessments = db.symptomAssessments.filter(s => s.userId !== userId);
   db.labReports = db.labReports.filter(l => l.userId !== userId);

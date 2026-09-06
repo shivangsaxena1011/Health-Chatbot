@@ -6,15 +6,18 @@ import { parseLabReportText } from '../lab/lab-parser';
 export class GeminiHealthProvider implements AIProvider {
   private client: GoogleGenAI | null = null;
 
-  constructor() {
+  private getClient(): GoogleGenAI | null {
+    if (this.client) return this.client;
     const apiKey = process.env.GEMINI_API_KEY;
     if (apiKey && apiKey !== 'PLACEHOLDER_API_KEY' && apiKey.trim().length > 10) {
       try {
         this.client = new GoogleGenAI({ apiKey });
+        return this.client;
       } catch (e) {
         console.warn('Could not initialize GoogleGenAI client:', e);
       }
     }
+    return null;
   }
 
   async generateHealthResponse(request: HealthChatRequest): Promise<HealthChatResponse> {
@@ -70,24 +73,38 @@ List the retrieved trusted organizations (WHO, CDC, MedlinePlus, NHS).
 ### Disclaimer
 "Important: Swasth AI is an informational tool for health awareness only. It does not provide medical diagnosis, professional advice, or treatment. Always consult a qualified healthcare professional regarding any medical condition."`;
 
+    const activeClient = this.getClient();
     // Attempt Gemini call if client is available
-    if (this.client) {
+    if (activeClient) {
       try {
-        const contents = request.messages.slice(-5).map(m => ({
-          role: m.role === 'user' ? 'user' : 'model',
-          parts: [{ text: m.content }],
-        }));
+        const contents: any[] = [];
+        let expectedRole: 'user' | 'model' = 'user';
 
-        contents.push({
-          role: 'user',
-          parts: [
-            {
-              text: `${emergencyContext}\n\n${profileContext}\n\nTrusted Evidence Grounding:\n${ragContext || 'General evidence-based public health principles.'}\n\nUser Question:\n${query}`,
-            },
-          ],
-        });
+        for (const m of (request.messages || []).slice(-6)) {
+          if (!m.content || !m.content.trim()) continue;
+          const role = m.role === 'user' ? 'user' : 'model';
+          if (role === expectedRole) {
+            contents.push({
+              role,
+              parts: [{ text: m.content }],
+            });
+            expectedRole = expectedRole === 'user' ? 'model' : 'user';
+          }
+        }
 
-        const response = await this.client.models.generateContent({
+        const currentTurnText = `${emergencyContext}\n\n${profileContext}\n\nTrusted Evidence Grounding:\n${ragContext || 'General evidence-based public health principles.'}\n\nUser Question:\n${query}`;
+
+        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+          // If the last history message was a user turn, append context to it
+          contents[contents.length - 1].parts[0].text += `\n\nFollow-up Question:\n${currentTurnText}`;
+        } else {
+          contents.push({
+            role: 'user',
+            parts: [{ text: currentTurnText }],
+          });
+        }
+
+        const response = await activeClient.models.generateContent({
           model: 'gemini-2.5-flash',
           contents: contents as any,
           config: {

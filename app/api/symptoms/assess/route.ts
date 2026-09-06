@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionUser } from '@/lib/auth/session';
-import { saveSymptomAssessment } from '@/lib/db/repository';
+import { saveSymptomAssessment, getSymptomAssessments } from '@/lib/db/repository';
 import { assessSymptoms } from '@/lib/symptoms/symptom-checker';
 import { sanitizeInput } from '@/lib/security/sanitize';
 
@@ -60,3 +60,17 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function GET() {
+  try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ assessments: [] });
+    }
+    const assessments = await getSymptomAssessments(session.id);
+    return NextResponse.json({ success: true, assessments });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to fetch assessments' }, { status: 500 });
+  }
+}
+

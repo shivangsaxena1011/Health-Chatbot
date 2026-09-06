@@ -149,8 +149,8 @@ Structured Output:
 
 ### Step 1: Clone Repository
 ```bash
-git clone https://github.com/Shagunkeshari25/Health_Chatbot_minorproject.git
-cd Health_Chatbot_minorproject
+git clone https://github.com/shivangsaxena1011/Health-Chatbot.git
+cd Health-Chatbot
 ```
 
 ### Step 2: Install Dependencies

@@ -132,15 +132,15 @@ export function parseLabReportText(rawText: string): LabAnalysisResult {
         if (numMatches && numMatches.length > 0) {
           const value = parseFloat(numMatches[0]);
 
-          // Look for reference range patterns like "12.0 - 15.0" or "70-99"
-          const rangeMatch = line.match(/(\d+(\.\d+)?)\s*[-–—to]\s*(\d+(\.\d+)?)/i);
+          // Look for reference range patterns like "12.0 - 15.0" or "70 to 99"
+          const rangeMatch = line.match(/(\d+(?:\.\d+)?)\s*(?:[-–—]|\bto\b)\s*(\d+(?:\.\d+)?)/i);
           let refRange = `${ref.normalMin} - ${ref.normalMax} ${ref.defaultUnit}`;
           let minRange = ref.normalMin;
           let maxRange = ref.normalMax;
 
           if (rangeMatch) {
             minRange = parseFloat(rangeMatch[1]);
-            maxRange = parseFloat(rangeMatch[3]);
+            maxRange = parseFloat(rangeMatch[2]);
             refRange = `${minRange} - ${maxRange} ${ref.defaultUnit}`;
           }
 

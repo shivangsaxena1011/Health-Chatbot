@@ -25,6 +25,7 @@ How can I assist you with your health questions today? I can provide educational
     },
   ]);
 
+  const [conversationId, setConversationId] = useState<string | undefined>(undefined);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -32,6 +33,7 @@ How can I assist you with your health questions today? I can provide educational
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recognitionRef = useRef<any>(null);
   const timerRef = useRef<any>(null);
 
   const scrollToBottom = () => {
@@ -65,6 +67,7 @@ How can I assist you with your health questions today? I can provide educational
         body: JSON.stringify({
           query,
           language: selectedLanguage.name,
+          conversationId,
           history: messages.slice(-6).map(m => ({ role: m.role, content: m.content })),
         }),
       });
@@ -72,6 +75,10 @@ How can I assist you with your health questions today? I can provide educational
       const data = await res.json();
       if (!res.ok || data.error) {
         throw new Error(data.error || 'Failed to receive response');
+      }
+
+      if (data.conversationId) {
+        setConversationId(data.conversationId);
       }
 
       setMessages(prev => [...prev, data.message]);
@@ -91,6 +98,7 @@ How can I assist you with your health questions today? I can provide educational
 
   const clearChat = () => {
     if (confirm('Clear all conversation messages?')) {
+      setConversationId(undefined);
       setMessages([
         {
           id: 'welcome',
@@ -137,6 +145,7 @@ How can I assist you with your health questions today? I can provide educational
           stopRecording();
         };
 
+        recognitionRef.current = recognition;
         recognition.start();
         setIsRecording(true);
         setRecordingSeconds(0);
@@ -171,6 +180,14 @@ How can I assist you with your health questions today? I can provide educational
   };
 
   const stopRecording = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        console.warn('Error stopping recognition:', e);
+      }
+      recognitionRef.current = null;
+    }
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
     }

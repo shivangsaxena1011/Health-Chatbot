@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bot, User, Copy, Check, Volume2, VolumeX, ExternalLink, ShieldCheck } from 'lucide-react';
 import { ChatMessage } from '@/lib/types/health';
 import EmergencyAlert from './EmergencyAlert';
@@ -13,6 +13,16 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message, onSelectSuggest
   const [copied, setCopied] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [showSources, setShowSources] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
@@ -60,7 +70,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message, onSelectSuggest
   };
 
   const formattedTime = () => {
-    if (!message.timestamp) return '';
+    if (!mounted || !message.timestamp) return '';
     const d = new Date(message.timestamp);
     return isNaN(d.getTime()) ? '' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };

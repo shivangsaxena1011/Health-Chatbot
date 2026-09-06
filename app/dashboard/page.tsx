@@ -30,10 +30,11 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [meRes, jRes, labRes] = await Promise.all([
+        const [meRes, jRes, labRes, assessRes] = await Promise.all([
           fetch('/api/auth/me'),
           fetch('/api/journal'),
           fetch('/api/lab-report/analyze'),
+          fetch('/api/symptoms/assess'),
         ]);
 
         const meData = await meRes.json();
@@ -44,6 +45,9 @@ export default function DashboardPage() {
 
         const labData = await labRes.json();
         if (labData.reports) setReports(labData.reports);
+
+        const assessData = await assessRes.json();
+        if (assessData.assessments) setAssessments(assessData.assessments);
       } catch (err) {
         console.error('Error loading dashboard data:', err);
       } finally {
@@ -175,14 +179,14 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Dual Section: Recent Journal & Reports */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Triple Section: Recent Journal, Lab Reports & Symptom Checks */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Health Journal Timeline Preview */}
           <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
                 <BookOpenCheck className="w-4 h-4 text-emerald-600" />
-                <span>Recent Health Journal Entries</span>
+                <span>Recent Health Journal</span>
               </h3>
               <Link href="/journal" className="text-xs font-bold text-emerald-600 hover:underline flex items-center">
                 <span>View All</span>
@@ -233,7 +237,7 @@ export default function DashboardPage() {
 
             {reports.length === 0 ? (
               <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl">
-                No lab documents uploaded yet. Upload a blood test or CBC report to extract values and explanations.
+                No lab documents uploaded yet. Upload a blood test or CBC report to extract values.
               </div>
             ) : (
               <div className="space-y-3">
@@ -246,6 +250,51 @@ export default function DashboardPage() {
                     <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{r.overallSummary}</p>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Symptom Assessments Preview */}
+          <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                <Stethoscope className="w-4 h-4 text-emerald-600" />
+                <span>Symptom Assessments</span>
+              </h3>
+              <Link href="/symptoms" className="text-xs font-bold text-emerald-600 hover:underline flex items-center">
+                <span>Assess</span>
+                <ArrowRight className="w-3 h-3 ml-1" />
+              </Link>
+            </div>
+
+            {assessments.length === 0 ? (
+              <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl">
+                No recent assessments. Complete a guided symptom assessment to get triage advice.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {assessments.slice(0, 3).map((a, idx) => {
+                  const urgencyBadgeColor =
+                    a.urgency === 'emergency'
+                      ? 'bg-red-100 text-red-700'
+                      : a.urgency === 'urgent'
+                      ? 'bg-amber-100 text-amber-800'
+                      : a.urgency === 'routine'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-emerald-100 text-emerald-800';
+
+                  return (
+                    <div key={idx} className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-bold text-slate-800">{a.primarySymptom}</p>
+                        <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md ${urgencyBadgeColor}`}>
+                          {a.urgency}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{a.recommendedAction}</p>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
